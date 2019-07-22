@@ -3,8 +3,23 @@
 Experiments with generic invariant combinators.
 
 # Usage
-Those combinators could be useful for bidirectional parsers.
-Here's an example JSON codec:
+Those combinators could be useful for bi-directional encoding libraries.
+
+For example, creating a bi-directional JSON encoding DSL like this
+```purescript
+-- usage with a simple Person record
+
+newtype Person = Person { name :: String, age :: Int }
+derive instance newtypePerson :: Newtype Person _
+
+person :: ObjectCodec Person
+person = imap wrap unwrap $ sequenceIR
+  { name: field "name" string
+  , age: field "age" int
+  }
+```
+
+would be as simple as this:
 
 ```purescript
 newtype CodecF f a = CodecF
@@ -49,16 +64,5 @@ field name (CodecF fa) = CodecF
         Nothing -> fail $ ForeignError $ "Missing field " <> name
         Just value -> fa.read $ Identity value
   , write: \val -> Object.fromFoldable [ Tuple name (unwrap $ fa.write val) ]
-  }
-
--- usage with a Person record
-
-newtype Person = Person { name :: String, age :: Int }
-derive instance newtypePerson :: Newtype Person _
-
-person :: ObjectCodec Person
-person = imap wrap unwrap $ sequenceIR
-  { name: field "name" string
-  , age: field "age" int
   }
 ```
