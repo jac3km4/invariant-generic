@@ -6,7 +6,7 @@ Experiments with generic invariant combinators.
 Those combinators could be useful for bidirectional parsers.
 Here's an example JSON codec:
 
-```
+```purescript
 newtype CodecF f a = CodecF
   { read :: f Foreign -> F a
   , write :: a -> f Foreign
